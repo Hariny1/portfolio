@@ -1,0 +1,108 @@
+---
+import Base from '../../layouts/Base.astro';
+import { projects, site } from '../../data/site';
+import type { Project } from '../../data/site';
+
+export function getStaticPaths() {
+  return projects.map((project) => ({ params: { slug: project.slug }, props: { project } }));
+}
+
+const { project } = Astro.props as { project: Project };
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const isDraft = project.status === 'In progress';
+---
+<Base title={`${project.title} | ${site.name}`} description={project.pitch}>
+  <div class="wrap">
+    <article class="hero" style="padding-bottom: 1rem;">
+      <a class="back-link" href={`${base}/#projects`}>Back to projects</a>
+      <h1 class="case-title">{project.title}</h1>
+      <p class="case-lead">{project.pitch}</p>
+
+      <dl class="facts">
+        <dt>Status</dt>
+        <dd><span class="status" data-tone="violet" data-state={project.status}>{project.status}</span></dd>
+        {project.dates && (<><dt>Dates</dt><dd>{project.dates}</dd></>)}
+        <dt>Stack</dt>
+        <dd><ul class="chips" data-tone="violet">{project.stack.map((s) => <li>{s}</li>)}</ul></dd>
+        {(project.repo || project.demo || project.paper) && (
+          <>
+            <dt>Links</dt>
+            <dd>
+              <ul class="card-links" style="margin-top:0">
+                {project.repo && <li><a href={project.repo}>Code</a></li>}
+                {project.demo && <li><a href={project.demo}>Live demo</a></li>}
+                {project.paper && <li><a href={project.paper}>Paper</a></li>}
+              </ul>
+            </dd>
+          </>
+        )}
+      </dl>
+
+      {isDraft && (
+        <p class="draft-note">
+          This write-up is a draft. The project is still being built, and the results below will be filled in once they are measured.
+        </p>
+      )}
+
+      <section class="case-section">
+        <h2>The problem</h2>
+        <p class="prose">{project.problem}</p>
+      </section>
+
+      <section class="case-section">
+        <h2>How it works</h2>
+        <ol class="steps">
+          {project.architecture.map((step) => <li>{step}</li>)}
+        </ol>
+      </section>
+
+      {project.decisions && (
+        <section class="case-section">
+          <h2>Decisions and trade-offs</h2>
+          {project.decisions.map((d) => (
+            <div class="decision" data-tone="violet">
+              <h3>{d.title}</h3>
+              <p>{d.body}</p>
+            </div>
+          ))}
+        </section>
+      )}
+
+      {project.results && (
+        <section class="case-section">
+          <h2>Results</h2>
+          <div class="table-wrap">
+            <table>
+              <caption>{project.results.caption}</caption>
+              <thead>
+                <tr>{project.results.columns.map((c) => <th scope="col">{c}</th>)}</tr>
+              </thead>
+              <tbody>
+                {project.results.rows.map((row) => (
+                  <tr>
+                    {row.map((cell, i) =>
+                      i === 0 ? (
+                        <th scope="row">{cell}</th>
+                      ) : (
+                        <td class={cell === 'Not yet measured' ? 'pending' : undefined}>{cell}</td>
+                      )
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
+
+      {project.improvements && (
+        <section class="case-section">
+          <h2>What I would improve</h2>
+          <ul class="plain-list">
+            {project.improvements.map((i) => <li>{i}</li>)}
+          </ul>
+        </section>
+      )}
+    </article>
+  </div>
+</Base>

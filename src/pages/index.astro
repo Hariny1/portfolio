@@ -1,0 +1,126 @@
+---
+import Base from '../layouts/Base.astro';
+import { site, projects } from '../data/site';
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const tones = ['violet', 'coral', 'mint', 'sun', 'sky'];
+const tone = (i: number, offset = 0) => tones[(i + offset) % tones.length];
+---
+<Base>
+  <div class="wrap">
+    <section class="hero" aria-labelledby="hero-name">
+      <h1 class="hero-name" id="hero-name">{site.name}</h1>
+      <div class="hero-body">
+        <div>
+          <p class="hero-role">{site.role}</p>
+          <ul class="btn-row">
+            {site.links.resume && <li><a class="btn btn-primary" href={site.links.resume}>Resume (PDF)</a></li>}
+            <li><a class="btn" href={site.links.github}>GitHub</a></li>
+            <li><a class="btn" href={site.links.linkedin}>LinkedIn</a></li>
+            <li><a class="btn" href={`mailto:${site.links.email}`}>Email</a></li>
+          </ul>
+        </div>
+        <div class="shapes" aria-hidden="true">
+          <span class="shape shape-sun"></span>
+          <span class="shape shape-ring"></span>
+          <span class="shape shape-dot"></span>
+          <span class="shape shape-square"></span>
+          <span class="shape shape-pill"></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="about" aria-labelledby="about-title">
+      <h2 class="section-title" id="about-title">About</h2>
+      <div class="about-grid">
+        <div class="prose about-text">
+          {site.about.map((para) => <p>{para}</p>)}
+        </div>
+        <div>
+          {site.skillGroups.map((g, i) => (
+            <div class="skill-group" data-tone={tone(i, 0)}>
+              <h3 class="skill-heading">{g.heading}</h3>
+              <ul class="chips">
+                {g.items.map((s) => <li>{s}</li>)}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="experience" aria-labelledby="experience-title">
+      <h2 class="section-title" id="experience-title">Experience</h2>
+      <ul class="card-stack">
+        {site.experience.map((r, i) => (
+          <li class="exp-card card" data-tone={tone(i, 0)} style="background: var(--surface); gap: 0;">
+            <div class="exp-head">
+              <div>
+                <h3 class="exp-title">{r.title}</h3>
+                <p class="exp-company">{r.place ? `${r.company}, ${r.place}` : r.company}</p>
+              </div>
+              {r.dates && <span class="exp-dates">{r.dates}</span>}
+            </div>
+            <ul class="exp-points">
+              {r.points.map((pt) => <li>{pt}</li>)}
+            </ul>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="section" id="projects" aria-labelledby="projects-title">
+      <h2 class="section-title" id="projects-title">Projects</h2>
+      <ul class="card-grid">
+        {projects.map((p, i) => (
+          <li class="card" data-tone={tone(i, 1)}>
+            <div class="card-meta"><span class="status" data-state={p.status}>{p.status}</span>{p.dates && <span class="card-dates">{p.dates}</span>}</div>
+            <h3 class="card-title"><a href={`${base}/projects/${p.slug}/`}>{p.title}</a></h3>
+            <p class="card-text">{p.pitch}</p>
+            <ul class="chips" aria-label="Tech stack">
+              {p.stack.map((s) => <li>{s}</li>)}
+            </ul>
+            <ul class="card-links">
+              <li><a href={`${base}/projects/${p.slug}/`}>Read the write-up</a></li>
+              {p.repo && <li><a href={p.repo}>Code</a></li>}
+              {p.demo && <li><a href={p.demo}>Live demo</a></li>}
+              {p.paper && <li><a href={p.paper}>Paper</a></li>}
+            </ul>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="section" aria-labelledby="credentials-title">
+      <h2 class="section-title" id="credentials-title">Education and credentials</h2>
+      <ul class="cred-grid">
+        {site.credentials.map((c, i) => (
+          <li class="cred-card" data-tone={tone(i, 2)}>
+            {c.kind && <span class="cred-kind">{c.kind}</span>}
+            <h3 class="cred-title">{c.text}</h3>
+            {c.blurb && <p class="cred-blurb">{c.blurb}</p>}
+            {c.points && (
+              <ul class="cred-points">
+                {c.points.map((pt) => <li>{pt}</li>)}
+              </ul>
+            )}
+            {c.href && <a class="cred-link" href={c.href}>{c.linkLabel ?? 'View'} <span aria-hidden="true">&rarr;</span></a>}
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="section" id="contact" aria-labelledby="contact-title">
+      <div class="contact-card">
+        <h2 class="section-title" id="contact-title">Contact</h2>
+        <p class="prose">
+          The best way to reach me is email. I'm looking for software engineering, AI engineering, and forward deployed engineering roles.
+        </p>
+        <ul class="btn-row" style="margin-top: 1rem;">
+          <li><a class="btn btn-primary" href={`mailto:${site.links.email}`}>{site.links.email}</a></li>
+          <li><a class="btn" href={site.links.linkedin}>LinkedIn</a></li>
+          <li><a class="btn" href={site.links.github}>GitHub</a></li>
+        </ul>
+      </div>
+    </section>
+  </div>
+</Base>
